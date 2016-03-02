@@ -1,24 +1,12 @@
 module SmartImporter
   class Spreadsheet
-    def initialize(sheet:, entity_type:, key_attribute:)
+    def initialize(sheet:, model:, key_attribute:)
       @sheet = sheet
-      @entity_type = entity_type
+      @model = model
       @header = @sheet.row(right_header_row) if right_header_row
       @added_objects_count = 0
       @key_attribute = key_attribute
-    end
-
-    def import_attendees
-      if indigitous_event_session = IndigitousEventSession.find_by(webinar_id: @sheet.cell(5,'A'))
-        extra_attributes = {}
-        puts indigitous_event_session
-        extra_attributes['session:relationship'] = { 
-            'indigitous_event_session' => indigitous_event_session.global_registry_id,
-            'client_integration_id' => EntityServices::Uuid.new.to_s
-          }
-        extra_attributes['indigitous_event_session_id'] = indigitous_event_session.id
-      end
-      return import_objects(added_attributes: extra_attributes || {})
+      @current_row = 1
     end
 
     def import_objects(added_attributes: {})
@@ -26,15 +14,10 @@ module SmartImporter
       ((right_header_row+1)..@sheet.last_row).each do |i|
         row = Hash[[@header, @sheet.row(i)].transpose]
         return 0 if row.empty?
-        GlobalRegistryModels::Retryer.new(RestClient::InternalServerError, max_attempts: 2).try do
-          if active_record = @entity_type.where(@key_attribute => valid_attributes(row)[:global_registry_id]).first
-            EntityServices::Updater.new(active_record: active_record,
-                                        update_params: valid_attributes(row).except(:global_registry_id, :id).merge(added_attributes)).update!
-          else
-            attributes = valid_attributes(row).merge!(added_attributes)
-            EntityServices::Creator.new(active_record_class: @entity_type,
-                                              create_params: valid_attributes(row).merge(added_attributes)).create!
-          end
+        if active_record = @model.where(@key_attribute => valid_attributes(row)).first
+          active_record.update(valid_attributes(row))
+        else
+          @model.creat(valid_attributes(row))
         end
         sleep 0.1
         @added_objects_count += 1
@@ -45,13 +28,18 @@ module SmartImporter
     private
 
     def right_header_row
-      if valid_cell?(8, 'Attended')
-        8
-      elsif valid_cell?(9, 'Attended')
-        9
-      else
-        1
+      until valid_line?
+        raise 'Invalid sheet' if sheet_is_invalid?
+        @current_row += 1 
       end
+    end
+
+    def sheet_is_invalid?
+      @current_row == 10
+    end
+
+    def valid_line?
+
     end
 
     def valid_attributes(row)
