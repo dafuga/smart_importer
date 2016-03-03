@@ -26,7 +26,7 @@ To import data from a spreadsheet to one of your models, first initiate the Impo
 importer = SmartImporter::Importer.new(file_path: "/path/to/file", model: User, key_attribute: :name)
 ```
 
-**Where:**
+Where,
 
   **file_path:** your file_path
 
