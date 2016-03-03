@@ -1,8 +1,6 @@
 # SmartImporter
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/smart_importer`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Smart importer allows you to import relevant data from spreadsheets (xlsx or csv) to any of your models with one line of code.
 
 ## Installation
 
@@ -22,7 +20,41 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+To import data from a spreadsheet to one of your models, first initiate the Importer object. For example:
+
+```ruby
+importer = SmartImporter::Importer.new(file_path: "/path/to/file", model: User, key_attribute: :name)
+```
+
+Where: 
+  :file_path => your file_path
+  :model => the active_record model that you want to fill with relevant data from.
+  :key_attribute => is an optional parameter that you are telling the importer must be unique within all records (Can be useful in some cases although your model validations should normally take care of this.)
+
+and then,
+
+To import all data in sheets from the spreadsheet:
+
+```ruby
+importer.import_all
+```
+or
+
+To import all data in sheets from the nth spreadsheet:
+
+```ruby
+importer.import_sheet(n)
+```
+or
+
+To import all data in sheets from the an array or range array_of_sheets:
+
+```ruby
+importer.import_sheets(array_of_sheets)
+```
+
+Et Voila!! Smart Importer should have found all relevant fields in the spreadsheet and added it to your database.
+
 
 ## Development
 
