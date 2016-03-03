@@ -57,7 +57,7 @@ To import all data in sheets from the an array or range array_of_sheets:
 importer.import_sheets(array_of_sheets)
 ```
 
-Et Voila!! Smart Importer should have found all relevant fields in the spreadsheet and added it to your database.
+Et Voila!! Smart Importer should have found all relevant fields in the spreadsheet and added them to your database.
 
 
 ## Development
