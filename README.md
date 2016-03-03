@@ -27,9 +27,13 @@ importer = SmartImporter::Importer.new(file_path: "/path/to/file", model: User, 
 ```
 
 Where: 
+
   :file_path => your file_path
+
   :model => the active_record model that you want to fill with relevant data from.
-  :key_attribute => is an optional parameter that you are telling the importer must be unique within all records (Can be useful in some cases although your model validations should normally take care of this.)
+
+  :key_attribute => is an optional parameter that you are telling the importer must be unique within all records (Can be useful in some cases although your model validations 
+  should normally take care of this.)
 
 and then,
 
